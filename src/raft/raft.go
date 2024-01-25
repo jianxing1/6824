@@ -83,12 +83,20 @@ const (
 
 const (
 	// vote expire time
-	MoreVoteTime = 100
-	MinVoteTime  = 75
+	//MoreVoteTime = 100
+	//MinVoteTime  = 75
+	//
+	////heart time
+	//HeartbeatSleep = 35
+	//AppliedSleep   = 15
+
+	// achieve lab3 speed
+	MoreVoteTime = 90
+	MinVoteTime  = 65
 
 	//heart time
-	HeartbeatSleep = 35
-	AppliedSleep   = 15
+	HeartbeatSleep = 32
+	AppliedSleep   = 13
 )
 
 //

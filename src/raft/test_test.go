@@ -858,7 +858,6 @@ func TestFigure82C(t *testing.T) {
 			cfg.connect(i)
 		}
 	}
-	fmt.Println("test2****************************")
 	cfg.one(rand.Int(), servers, true)
 
 	cfg.end()

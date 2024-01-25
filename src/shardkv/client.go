@@ -40,6 +40,8 @@ type Clerk struct {
 	config   shardctrler.Config
 	make_end func(string) *labrpc.ClientEnd
 	// You will have to modify this struct.
+	seqId    int
+	clientId int64
 }
 
 //
@@ -56,6 +58,9 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 	ck.sm = shardctrler.MakeClerk(ctrlers)
 	ck.make_end = make_end
 	// You'll have to add code here.
+	ck.clientId = nrand()
+	ck.seqId = 0
+	ck.config = ck.sm.Query(-1)
 	return ck
 }
 
@@ -66,10 +71,13 @@ func MakeClerk(ctrlers []*labrpc.ClientEnd, make_end func(string) *labrpc.Client
 // You will have to modify this function.
 //
 func (ck *Clerk) Get(key string) string {
-	args := GetArgs{}
-	args.Key = key
-
+	ck.seqId++
 	for {
+		args := GetArgs{
+			Key:       key,
+			ClientId:  ck.clientId,
+			RequestId: ck.seqId,
+		}
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
@@ -91,8 +99,6 @@ func (ck *Clerk) Get(key string) string {
 		// ask controler for the latest configuration.
 		ck.config = ck.sm.Query(-1)
 	}
-
-	return ""
 }
 
 //
@@ -100,13 +106,16 @@ func (ck *Clerk) Get(key string) string {
 // You will have to modify this function.
 //
 func (ck *Clerk) PutAppend(key string, value string, op string) {
-	args := PutAppendArgs{}
-	args.Key = key
-	args.Value = value
-	args.Op = op
-
+	ck.seqId++
 
 	for {
+		args := PutAppendArgs{
+			Key:       key,
+			Value:     value,
+			Op:        Operation(op),
+			ClientId:  ck.clientId,
+			RequestId: ck.seqId,
+		}
 		shard := key2shard(key)
 		gid := ck.config.Shards[shard]
 		if servers, ok := ck.config.Groups[gid]; ok {
